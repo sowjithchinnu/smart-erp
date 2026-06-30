@@ -44,11 +44,15 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
+    console.log(req.body); // ADD THIS
 
     const { email, password } = req.body;
 
-if (!email || !password) {
-    return res.status(400).json({
+    console.log("Attempting login for email:", email);
+
+    if (!email || !password) {
+      console.log("Email and password are required");
+      return res.status(400).json({
         success: false,
         message: "Email and password are required"
     });
@@ -58,6 +62,7 @@ if (!email || !password) {
       "SELECT * FROM users WHERE email = $1",
       [email]
     );
+    console.log("User found:", userResult.rows);
 
     if (userResult.rows.length === 0) {
       return res.status(401).json({
@@ -72,6 +77,7 @@ if (!email || !password) {
       password,
       user.password
     );
+    console.log("Password match:", isMatch);
 
     if (!isMatch) {
       return res.status(401).json({
