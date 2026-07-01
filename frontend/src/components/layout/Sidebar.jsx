@@ -11,13 +11,30 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     router.push("/login");
   };
 
-  const menuItems = [
-    { id: "overview", label: "Overview", icon: "📊" },
-    { id: "customers", label: "Customers", icon: "👥" },
-    { id: "suppliers", label: "Suppliers", icon: "🏢" },
-    { id: "stock", label: "Stock Items", icon: "📦" },
-    { id: "vouchers", label: "Vouchers", icon: "📝" },
-    { id: "reports", label: "Reports", icon: "📈" },
+  const menuGroups = [
+    {
+      title: null,
+      items: [{ id: "overview", label: "Overview", icon: "📊" }],
+    },
+    {
+      title: "Ledgers",
+      items: [
+        { id: "customers", label: "Customers", icon: "👥" },
+        { id: "suppliers", label: "Suppliers", icon: "🏢" },
+        { id: "stock", label: "Stock Items", icon: "📦" },
+        { id: "cash", label: "Cash Ledgers", icon: "💵" },
+        { id: "bank", label: "Bank Ledgers", icon: "🏦" },
+        { id: "income", label: "Income Ledgers", icon: "💰" },
+        { id: "expense", label: "Expense Ledgers", icon: "📉" },
+      ],
+    },
+    {
+      title: null,
+      items: [
+        { id: "vouchers", label: "Vouchers", icon: "📝" },
+        { id: "reports", label: "Reports", icon: "📈" },
+      ],
+    },
   ];
 
   return (
@@ -27,23 +44,39 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       </div>
 
       <nav className="flex-1 p-4">
-        <ul className="space-y-2">
-          {menuItems.map((item) => (
-            <li key={item.id}>
-              <button
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition-colors ${
-                  activeTab === item.id
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                }`}
-              >
-                <span className="text-lg">{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            </li>
+        <div className="space-y-4">
+          {menuGroups.map((group, index) => (
+            <div
+              key={index}
+              className={index !== 0 ? "bg-gray-700 rounded-lg p-3" : ""}
+            >
+              {group.title && (
+                <p className="mb-3 px-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+                  {group.title}
+                </p>
+              )}
+              <ul className={index !== 0 ? "space-y-1" : "space-y-2"}>
+                {group.items.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      onClick={() => setActiveTab(item.id)}
+                      className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition-colors ${
+                        activeTab === item.id
+                          ? "bg-blue-600 text-white"
+                          : index !== 0
+                          ? "text-gray-200 hover:bg-gray-600 hover:text-white"
+                          : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                      }`}
+                    >
+                      <span className="text-lg">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       </nav>
 
       <div className="p-4 border-t border-gray-700">
