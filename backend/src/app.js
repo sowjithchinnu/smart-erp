@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const companyRoutes = require("./routes/company.routes");
 const authRoutes = require("./routes/auth.routes");
 const ledgerRoutes = require("./routes/ledger.routes");
+const stockRoutes = require("./routes/stock.routes");
 
 const app = express();
 app.use((req, res, next) => {
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use("/api/company", companyRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/ledger", ledgerRoutes);
+app.use("/api/stock", stockRoutes);
 
 app.get("/", (req, res) => {
     res.json({

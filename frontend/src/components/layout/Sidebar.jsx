@@ -21,6 +21,8 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       items: [
         { id: "customers", label: "Customers", icon: "👥" },
         { id: "suppliers", label: "Suppliers", icon: "🏢" },
+        { id: "stock-groups", label: "Stock Groups", icon: "🗂️" },
+        { id: "units", label: "Units", icon: "⚖️" },
         { id: "stock", label: "Stock Items", icon: "📦" },
         { id: "cash", label: "Cash Ledgers", icon: "💵" },
         { id: "bank", label: "Bank Ledgers", icon: "🏦" },

@@ -1,6 +1,7 @@
 require("dotenv").config();
 console.log(process.env.PORT);
 require("./config/db");
+require("./config/init");
 
 const app = require("./app");
 

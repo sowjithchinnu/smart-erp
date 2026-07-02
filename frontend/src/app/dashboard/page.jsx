@@ -5,6 +5,7 @@ import { useCompany } from "../../context/CompanyContext";
 import Sidebar from "../../components/layout/Sidebar";
 import Header from "../../components/layout/Header";
 import LedgerModule from "../../components/ledger/LedgerModule";
+import StockModule from "../../components/stock/StockModule";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -24,11 +25,26 @@ const moduleConfig = {
     createLabel: "Supplier",
     emptyMessage: "Add suppliers to start managing your supplier ledger.",
   },
+  "stock-groups": {
+    label: "Stock Groups",
+    entityType: "group",
+    createLabel: "Stock Group",
+    emptyMessage: "Add stock groups to organize your inventory.",
+    singularLabel: "Stock Group",
+  },
+  units: {
+    label: "Units of Measure",
+    entityType: "unit",
+    createLabel: "Unit",
+    emptyMessage: "Add units of measure to track quantities accurately.",
+    singularLabel: "Unit",
+  },
   stock: {
     label: "Stock Items",
-    ledgerType: "STOCK",
+    entityType: "item",
     createLabel: "Stock Item",
     emptyMessage: "Add stock items to start tracking inventory.",
+    singularLabel: "Stock Item",
   },
   cash: {
     label: "Cash Ledgers",
@@ -196,13 +212,19 @@ function DashboardContent({ activeTab, setActiveTab, selectedCompany, companies,
 
       case "customers":
       case "suppliers":
-      case "stock":
       case "cash":
       case "bank":
       case "income":
       case "expense":
         return (
           <LedgerModule activeModule={activeModule} selectedCompany={selectedCompany} />
+        );
+
+      case "stock":
+      case "stock-groups":
+      case "units":
+        return (
+          <StockModule activeModule={activeModule} selectedCompany={selectedCompany} />
         );
 
       case "vouchers":
