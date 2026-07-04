@@ -6,6 +6,7 @@ const authRoutes = require("./routes/auth.routes");
 const ledgerRoutes = require("./routes/ledger.routes");
 const stockRoutes = require("./routes/stock.routes");
 const purchaseRoutes = require("./routes/purchase.routes");
+const salesRoutes = require("./routes/sales.routes");
 const app = express();
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
@@ -24,6 +25,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/ledger", ledgerRoutes);
 app.use("/api/stock", stockRoutes);
 app.use("/api/purchase", purchaseRoutes);
+app.use("/api/sales", salesRoutes);
 
 app.get("/", (req, res) => {
     res.json({

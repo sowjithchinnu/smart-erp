@@ -7,6 +7,7 @@ import Header from "../../components/layout/Header";
 import LedgerModule from "../../components/ledger/LedgerModule";
 import StockModule from "../../components/stock/StockModule";
 import PurchaseModule from "../../components/purchase/PurchaseModule";
+import SalesModule from "../../components/sales/SalesModule";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -229,6 +230,8 @@ function DashboardContent({ activeTab, setActiveTab, selectedCompany, companies,
         );
       case "purchase":
     return <PurchaseModule companyId={selectedCompany.id} />;
+        case "sales":
+  return <SalesModule companyId={selectedCompany.id} />;
       case "vouchers":
         return (
           <div className="space-y-6">
