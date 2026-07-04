@@ -1,7 +1,28 @@
 "use client";
+import { useEffect } from "react";
 import { invoiceService } from "../../services/invoiceService";
 
 export default function Invoice({ invoice, invoiceId, error }) {
+  useEffect(() => {
+    const handlePrintInvoice = () => {
+      window.print();
+    };
+
+    const handleDownloadPDF = () => {
+      if (invoice?.id || invoiceId) {
+        invoiceService.downloadSalesInvoice(invoiceId || invoice.id);
+      }
+    };
+
+    window.addEventListener("printInvoice", handlePrintInvoice);
+    window.addEventListener("downloadPDF", handleDownloadPDF);
+
+    return () => {
+      window.removeEventListener("printInvoice", handlePrintInvoice);
+      window.removeEventListener("downloadPDF", handleDownloadPDF);
+    };
+  }, [invoice, invoiceId]);
+
   if (error) {
     return (
       <div className="bg-white p-8 rounded-lg shadow max-w-4xl mx-auto">

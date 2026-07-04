@@ -10,6 +10,18 @@ export default function SalesModule({ companyId }) {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
+  useEffect(() => {
+    const handleNewItem = () => {
+      setShowForm(true);
+    };
+
+    window.addEventListener("newItem", handleNewItem);
+
+    return () => {
+      window.removeEventListener("newItem", handleNewItem);
+    };
+  }, []);
+
   const loadSalesVouchers = async () => {
     try {
       const data = await salesService.getSalesVouchers(companyId);

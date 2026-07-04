@@ -80,15 +80,17 @@ export default function useKeyboardShortcuts() {
         return;
       }
 
+      // Check Ctrl+Shift+P BEFORE Ctrl+P (more specific condition first)
+      if (isCtrlPressed && isShiftPressed && event.key.toLowerCase() === "p") {
+        event.preventDefault();
+        window.dispatchEvent(new CustomEvent("downloadPDF"));
+        return;
+      }
+
       if (isCtrlPressed && event.key.toLowerCase() === "p") {
         event.preventDefault();
         window.dispatchEvent(new CustomEvent("printInvoice"));
         return;
-      }
-
-      if (isCtrlPressed && isShiftPressed && event.key.toLowerCase() === "p") {
-        event.preventDefault();
-        window.dispatchEvent(new CustomEvent("downloadPDF"));
       }
     };
 

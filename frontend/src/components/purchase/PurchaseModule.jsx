@@ -10,6 +10,18 @@ export default function PurchaseModule({ companyId }) {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
+  useEffect(() => {
+    const handleNewItem = () => {
+      setShowForm(true);
+    };
+
+    window.addEventListener("newItem", handleNewItem);
+
+    return () => {
+      window.removeEventListener("newItem", handleNewItem);
+    };
+  }, []);
+
   const loadPurchaseVouchers = async () => {
     try {
       const data = await purchaseService.getPurchaseVouchers(companyId);
