@@ -42,12 +42,12 @@ export default function Sidebar({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <div className="w-64 bg-gray-800 text-white flex flex-col">
-      <div className="p-4 border-b border-gray-700">
+    <div className="w-64 h-screen bg-gray-800 text-white flex flex-col overflow-hidden">
+      <div className="p-4 border-b border-gray-700 shrink-0">
         <h1 className="text-xl font-bold">SmartERP</h1>
       </div>
 
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 overflow-y-auto p-4">
         <div className="space-y-4">
           {menuGroups.map((group, index) => (
             <div
@@ -83,7 +83,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         </div>
       </nav>
 
-      <div className="p-4 border-t border-gray-700">
+      <div className="p-4 border-t border-gray-700 mt-auto shrink-0">
         <div className="mb-4">
           <p className="text-sm text-gray-400">Logged in as:</p>
           <p className="text-sm font-semibold">{user?.name}</p>

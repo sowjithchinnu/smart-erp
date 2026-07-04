@@ -2,22 +2,24 @@ import api from "./api";
 
 export const authService = {
   async login(email, password) {
-  console.log("AuthService: Starting login");
+    try {
+      const response = await api.post("/api/auth/login", {
+        email,
+        password,
+      });
 
-  const response = await api.post("/api/auth/login", {
-    email,
-    password,
-  });
+      const { token, user } = response.data;
 
-  console.log("AuthService: Response received", response.data);
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-  const { token, user } = response.data;
-
-  localStorage.setItem("token", token);
-  localStorage.setItem("user", JSON.stringify(user));
-
-  return { token, user };
-},
+      return { token, user };
+    } catch (error) {
+      const message =
+        error.response?.data?.message || error.message || "Login failed";
+      throw new Error(message);
+    }
+  },
 
   async register(name, email, password) {
     const response = await api.post("/api/auth/register", {

@@ -8,6 +8,7 @@ import LedgerModule from "../../components/ledger/LedgerModule";
 import StockModule from "../../components/stock/StockModule";
 import PurchaseModule from "../../components/purchase/PurchaseModule";
 import SalesModule from "../../components/sales/SalesModule";
+import ReportsModule from "../../components/reports/ReportsModule";
 import { companyService } from "../../services/companyService";
 import { purchaseService } from "../../services/purchaseService";
 import { salesService } from "../../services/salesService";
@@ -356,14 +357,7 @@ function DashboardContent({ activeTab, setActiveTab, selectedCompany, companies,
         );
 
       case "reports":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">Reports</h2>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <p className="text-gray-600">Reports coming soon...</p>
-            </div>
-          </div>
-        );
+        return <ReportsModule companyId={selectedCompany.id} />;
 
       default:
         return null;
@@ -383,9 +377,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex h-screen bg-blue-100">
+    <div className="flex min-h-screen overflow-hidden bg-blue-100">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         <Header />
         <main className="flex-1 overflow-auto p-6">
           <Suspense

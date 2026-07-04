@@ -13,26 +13,24 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  console.log("Login button clicked");
+    if (loading) {
+      return;
+    }
 
-  setError("");
-  setLoading(true);
+    setError("");
+    setLoading(true);
 
-  try {
-    console.log("Calling login...");
-    await login(email, password);
-    console.log("Login successful");
-    router.push("/company-selection");
-  } catch (err) {
-    console.log("Login failed", err);
-    setError(err.message || "Login failed");
-  } finally {
-    console.log("Finally block reached");
-    setLoading(false);
-  }
-};
+    try {
+      await login(email, password);
+      router.push("/company-selection");
+    } catch (err) {
+      setError(err?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

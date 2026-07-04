@@ -8,6 +8,7 @@ const stockRoutes = require("./routes/stock.routes");
 const purchaseRoutes = require("./routes/purchase.routes");
 const salesRoutes = require("./routes/sales.routes");
 const invoiceRoutes = require("./routes/invoice.routes");
+const reportRoutes = require("./routes/report.routes");
 const app = express();
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
@@ -28,6 +29,7 @@ app.use("/api/stock", stockRoutes);
 app.use("/api/purchase", purchaseRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/invoice", invoiceRoutes);
+app.use("/api/reports", reportRoutes);
 
 app.get("/", (req, res) => {
     res.json({
