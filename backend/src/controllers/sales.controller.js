@@ -11,6 +11,19 @@ const createSalesVoucher = async (req, res) => {
       notes,
       items,
     } = req.body;
+    const userId = req.user.userId;
+
+    const companyCheck = await client.query(
+      `SELECT id FROM companies WHERE id = $1 AND user_id = $2`,
+      [company_id, userId]
+    );
+
+    if (companyCheck.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
 
     // Validation
     if (
@@ -136,6 +149,19 @@ for (const item of items) {
 const getSalesVouchers = async (req, res) => {
   try {
     const { companyId } = req.params;
+    const userId = req.user.userId;
+
+    const companyCheck = await db.query(
+      `SELECT id FROM companies WHERE id = $1 AND user_id = $2`,
+      [companyId, userId]
+    );
+
+    if (companyCheck.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
 
     const result = await db.query(
       `

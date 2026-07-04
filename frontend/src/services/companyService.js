@@ -11,6 +11,11 @@ export const companyService = {
     return response.data;
   },
 
+  async getDashboardStats(id) {
+    const response = await api.get(`/api/company/${id}/dashboard`);
+    return response.data;
+  },
+
   async createCompany(companyData) {
     const response = await api.post("/api/company", companyData);
     return response.data;

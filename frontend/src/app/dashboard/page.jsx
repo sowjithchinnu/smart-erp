@@ -8,6 +8,9 @@ import LedgerModule from "../../components/ledger/LedgerModule";
 import StockModule from "../../components/stock/StockModule";
 import PurchaseModule from "../../components/purchase/PurchaseModule";
 import SalesModule from "../../components/sales/SalesModule";
+import { companyService } from "../../services/companyService";
+import { purchaseService } from "../../services/purchaseService";
+import { salesService } from "../../services/salesService";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
@@ -87,6 +90,13 @@ function DashboardContent({ activeTab, setActiveTab, selectedCompany, companies,
   const searchParams = useSearchParams();
   const companyId = searchParams.get("companyId");
   const activeModule = moduleConfig[activeTab];
+  const [overviewStats, setOverviewStats] = useState({
+    customers: 0,
+    suppliers: 0,
+    stockItems: 0,
+  });
+  const [companyProfile, setCompanyProfile] = useState(selectedCompany);
+  const [vouchers, setVouchers] = useState([]);
 
   useEffect(() => {
     if (!companyId) {
@@ -101,6 +111,62 @@ function DashboardContent({ activeTab, setActiveTab, selectedCompany, companies,
       }
     }
   }, [companyId, companies, selectedCompany, selectCompany, router]);
+
+  useEffect(() => {
+    if (!selectedCompany?.id) {
+      return;
+    }
+
+    let isMounted = true;
+
+    const loadDashboardData = async () => {
+      try {
+        const [dashboardData, purchaseVouchers, salesVouchers] = await Promise.all([
+          companyService.getDashboardStats(selectedCompany.id),
+          purchaseService.getPurchaseVouchers(selectedCompany.id),
+          salesService.getSalesVouchers(selectedCompany.id),
+        ]);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setCompanyProfile(dashboardData.company || selectedCompany);
+        setOverviewStats({
+          customers: dashboardData.counts?.customers ?? 0,
+          suppliers: dashboardData.counts?.suppliers ?? 0,
+          stockItems: dashboardData.counts?.stockItems ?? 0,
+        });
+
+        const mergedVouchers = [
+          ...purchaseVouchers.map((voucher) => ({
+            ...voucher,
+            voucherType: "Purchase",
+            partyName: voucher.supplier_name,
+            date: voucher.voucher_date,
+            totalAmount: voucher.total_amount,
+          })),
+          ...salesVouchers.map((voucher) => ({
+            ...voucher,
+            voucherType: "Sales",
+            partyName: voucher.customer_name,
+            date: voucher.voucher_date,
+            totalAmount: voucher.total_amount,
+          })),
+        ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        setVouchers(mergedVouchers);
+      } catch (error) {
+        console.error("Failed to load dashboard data:", error);
+      }
+    };
+
+    loadDashboardData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedCompany?.id]);
 
   if (!selectedCompany) {
     return (
@@ -124,21 +190,21 @@ function DashboardContent({ activeTab, setActiveTab, selectedCompany, companies,
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">
                   Total Customers
                 </h3>
-                <p className="text-3xl font-bold text-blue-600">0</p>
+                <p className="text-3xl font-bold text-blue-600">{overviewStats.customers}</p>
               </div>
 
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">
                   Total Suppliers
                 </h3>
-                <p className="text-3xl font-bold text-green-600">0</p>
+                <p className="text-3xl font-bold text-green-600">{overviewStats.suppliers}</p>
               </div>
 
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">
                   Stock Items
                 </h3>
-                <p className="text-3xl font-bold text-purple-600">0</p>
+                <p className="text-3xl font-bold text-purple-600">{overviewStats.stockItems}</p>
               </div>
             </div>
 
@@ -173,7 +239,7 @@ function DashboardContent({ activeTab, setActiveTab, selectedCompany, companies,
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("vouchers")}
+                  onClick={() => setActiveTab("purchase")}
                   className="bg-orange-600 hover:bg-orange-700 text-white p-4 rounded-lg transition"
                 >
                   <div className="text-2xl mb-2">🧾</div>
@@ -189,23 +255,23 @@ function DashboardContent({ activeTab, setActiveTab, selectedCompany, companies,
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">GST Number</p>
-                  <p className="text-gray-800">{selectedCompany.gst_number}</p>
+                  <p className="text-gray-800">{companyProfile?.gst_number ?? selectedCompany.gst_number}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Contact Number</p>
-                  <p className="text-gray-800">{selectedCompany.contact_phone}</p>
+                  <p className="text-gray-800">{companyProfile?.contact_phone || "-"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">State</p>
-                  <p className="text-gray-800">{selectedCompany.state}</p>
+                  <p className="text-gray-800">{companyProfile?.state ?? selectedCompany.state}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Financial Year</p>
-                  <p className="text-gray-800">{selectedCompany.financial_year}</p>
+                  <p className="text-gray-800">{companyProfile?.financial_year ?? selectedCompany.financial_year}</p>
                 </div>
                 <div className="md:col-span-2">
                   <p className="text-sm text-gray-500">Address</p>
-                  <p className="text-gray-800">{selectedCompany.address}</p>
+                  <p className="text-gray-800">{companyProfile?.address ?? selectedCompany.address}</p>
                 </div>
               </div>
             </div>
@@ -237,18 +303,54 @@ function DashboardContent({ activeTab, setActiveTab, selectedCompany, companies,
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-800">Vouchers</h2>
 
-            <div className="bg-white rounded-lg shadow-md p-10 text-center">
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                No Vouchers Found
-              </h3>
+            <div className="bg-white rounded-lg shadow-md p-6">
+              {vouchers.length === 0 ? (
+                <div className="text-center py-8">
+                  <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                    No Vouchers Found
+                  </h3>
 
-              <p className="text-gray-500 mb-4">
-                Create your first sales or purchase voucher.
-              </p>
+                  <p className="text-gray-500 mb-4">
+                    Create your first sales or purchase voucher.
+                  </p>
 
-              <button className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700">
-                + Create Voucher
-              </button>
+                  <button
+                    onClick={() => setActiveTab("purchase")}
+                    className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700"
+                  >
+                    + Create Voucher
+                  </button>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm text-left">
+                    <thead>
+                      <tr className="border-b border-gray-200 text-gray-600">
+                        <th className="py-3 pr-4">Voucher Number</th>
+                        <th className="py-3 pr-4">Voucher Type</th>
+                        <th className="py-3 pr-4">Party Name</th>
+                        <th className="py-3 pr-4">Date</th>
+                        <th className="py-3">Total Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {vouchers.map((voucher) => (
+                        <tr key={`${voucher.voucherType}-${voucher.id}`} className="border-b border-gray-100">
+                          <td className="py-3 pr-4 text-gray-800">{voucher.voucher_number}</td>
+                          <td className="py-3 pr-4 text-gray-800">{voucher.voucherType}</td>
+                          <td className="py-3 pr-4 text-gray-800">{voucher.partyName}</td>
+                          <td className="py-3 pr-4 text-gray-800">
+                            {new Date(voucher.date).toLocaleDateString()}
+                          </td>
+                          <td className="py-3 text-gray-800">
+                            {Number(voucher.totalAmount).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         );

@@ -7,6 +7,7 @@ const {
     createCompany,
     getCompanies,
     getCompanyById,
+    getCompanyDashboard,
     updateCompany,
     deleteCompany
 } = require("../controllers/company.controller");
@@ -31,6 +32,8 @@ router.get(
 );
 
 router.post("/", authMiddleware, createCompany);
+
+router.get("/:id/dashboard", authMiddleware, getCompanyDashboard);
 
 router.get("/:id", authMiddleware, getCompanyById);
 

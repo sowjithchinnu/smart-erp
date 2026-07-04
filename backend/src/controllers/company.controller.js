@@ -138,6 +138,65 @@ const getCompanyById = async (req, res) => {
     }
 };
 
+const getCompanyDashboard = async (req, res) => {
+  try {
+    const companyId = req.params.id;
+    const userId = req.user.userId;
+
+    const companyResult = await db.query(
+      `SELECT id, company_name, address, gst_number, financial_year, state, contact_person, contact_email, contact_phone
+       FROM companies
+       WHERE id = $1 AND user_id = $2`,
+      [companyId, userId]
+    );
+
+    if (companyResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
+
+    const [customerCountResult, supplierCountResult, stockCountResult] = await Promise.all([
+      db.query(
+        `SELECT COUNT(*)::int AS count
+         FROM ledgers
+         WHERE company_id = $1 AND UPPER(ledger_type) = 'CUSTOMER'`,
+        [companyId]
+      ),
+      db.query(
+        `SELECT COUNT(*)::int AS count
+         FROM ledgers
+         WHERE company_id = $1 AND UPPER(ledger_type) = 'SUPPLIER'`,
+        [companyId]
+      ),
+      db.query(
+        `SELECT COUNT(*)::int AS count
+         FROM stock_items
+         WHERE company_id = $1`,
+        [companyId]
+      ),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      company: companyResult.rows[0],
+      counts: {
+        customers: customerCountResult.rows[0].count,
+        suppliers: supplierCountResult.rows[0].count,
+        stockItems: stockCountResult.rows[0].count,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+};
+
 const updateCompany = async (req, res) => {
   try {
     const companyId = req.params.id;
@@ -239,6 +298,7 @@ module.exports = {
   createCompany,
   getCompanies,
   getCompanyById,
+  getCompanyDashboard,
   updateCompany,
   deleteCompany
 };
