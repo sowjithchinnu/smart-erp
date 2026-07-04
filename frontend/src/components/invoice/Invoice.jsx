@@ -1,6 +1,15 @@
 "use client";
 import { invoiceService } from "../../services/invoiceService";
-export default function Invoice({ invoice }) {
+
+export default function Invoice({ invoice, invoiceId, error }) {
+  if (error) {
+    return (
+      <div className="bg-white p-8 rounded-lg shadow max-w-4xl mx-auto">
+        <p className="text-gray-700">{error}</p>
+      </div>
+    );
+  }
+
   if (!invoice) return null;
 
   return (
@@ -57,11 +66,11 @@ export default function Invoice({ invoice }) {
         </button>
 
         <button
-  onClick={() => invoiceService.downloadSalesInvoice(invoice.id)}
-  className="bg-green-600 text-white px-5 py-2 rounded"
->
-  Download PDF
-</button>
+          onClick={() => invoiceService.downloadSalesInvoice(invoiceId || invoice.id)}
+          className="bg-green-600 text-white px-5 py-2 rounded"
+        >
+          Download PDF
+        </button>
 
       </div>
     </div>
