@@ -2,10 +2,12 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { companyService } from "../services/companyService";
+import { useAuth } from "./AuthContext";
 
 const CompanyContext = createContext(null);
 
 export const CompanyProvider = ({ children }) => {
+  const { token, loading: authLoading } = useAuth();
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -97,8 +99,10 @@ setCompanies(data);
   };
 
   useEffect(() => {
-  loadCompanies();
-}, []);
+    if (!authLoading && token) {
+      loadCompanies();
+    }
+  }, [authLoading, token]);
   const value = {
     companies,
     selectedCompany,
